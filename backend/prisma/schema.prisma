@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Default admin user — the system seeds a single user
+model User {
+  id    Int    @id @default(autoincrement())
+  name  String
+  email String @unique
+
+  eventTypes   EventType[]
+  availability Availability[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+/// Configurable meeting types (e.g., "30 Min Meeting", "Quick Chat")
+model EventType {
+  id       Int    @id @default(autoincrement())
+  name     String
+  duration Int    // duration in minutes
+  slug     String @unique
+  color    String @default("#006BFF")
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  bookings Booking[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("event_types")
+}
+
+/// Weekly recurring availability windows (one entry per day-of-week per user)
+model Availability {
+  id        Int    @id @default(autoincrement())
+  dayOfWeek Int    @map("day_of_week") // 0 = Sunday, 6 = Saturday
+  startTime String @map("start_time") // "09:00" HH:mm
+  endTime   String @map("end_time")   // "17:00" HH:mm
+  timezone  String @default("Asia/Kolkata")
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, dayOfWeek])
+  @@map("availability")
+}
+
+/// Individual booking records from public invitees
+model Booking {
+  id          Int       @id @default(autoincrement())
+  eventTypeId Int       @map("event_type_id")
+  eventType   EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+
+  name      String // invitee name
+  email     String // invitee email
+  startTime DateTime @map("start_time")
+  endTime   DateTime @map("end_time")
+  status    String   @default("scheduled") // scheduled | cancelled
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([eventTypeId, startTime, endTime])
+  @@index([status])
+  @@map("bookings")
+}
