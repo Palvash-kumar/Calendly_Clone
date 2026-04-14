@@ -16,8 +16,8 @@ function ConfirmationContent() {
   const duration = searchParams.get('duration');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)] p-4">
-      <div className="card max-w-lg w-full text-center py-12 px-8 animate-scale-in">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)] p-3 sm:p-4">
+      <div className="card max-w-lg w-full text-center py-8 sm:py-12 px-5 sm:px-8 animate-scale-in">
         {/* Success checkmark */}
         <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-6">
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -26,7 +26,7 @@ function ConfirmationContent() {
           </svg>
         </div>
 
-        <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] mb-2">
           You are scheduled
         </h1>
         <p className="text-[var(--text-secondary)] text-sm mb-8">
@@ -34,7 +34,7 @@ function ConfirmationContent() {
         </p>
 
         {/* Booking Details Card */}
-        <div className="bg-[var(--bg-secondary)] rounded-xl p-6 text-left mb-8">
+        <div className="bg-[var(--bg-secondary)] rounded-xl p-4 sm:p-6 text-left mb-6 sm:mb-8">
           <h3 className="text-base font-semibold text-[var(--text-primary)] mb-4 pb-3 border-b border-[var(--border)]">
             {eventName}
           </h3>
@@ -106,8 +106,8 @@ export default function ConfirmationPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)]">
-          <div className="skeleton w-96 h-96 rounded-2xl" />
+        <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)] p-4">
+          <div className="skeleton w-full max-w-sm h-80 sm:h-96 rounded-2xl" />
         </div>
       }
     >

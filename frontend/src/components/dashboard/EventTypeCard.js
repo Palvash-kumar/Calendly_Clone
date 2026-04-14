@@ -68,7 +68,7 @@ export default function EventTypeCard({ eventType, onEdit, onDelete }) {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-[var(--border)] pt-3 -mx-6 px-6">
+        <div className="border-t border-[var(--border)] pt-3 -mx-4 px-4 sm:-mx-6 sm:px-6">
           <div className="flex items-center justify-between">
             {/* Copy link */}
             <button

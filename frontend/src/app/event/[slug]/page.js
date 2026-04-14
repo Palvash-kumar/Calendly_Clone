@@ -104,8 +104,8 @@ export default function PublicBookingPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)]">
-        <div className="card text-center py-16 px-12 max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)] p-4">
+        <div className="card text-center py-12 sm:py-16 px-6 sm:px-12 max-w-md w-full">
           <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
@@ -125,10 +125,10 @@ export default function PublicBookingPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)]">
-        <div className="card max-w-3xl w-full mx-4">
-          <div className="flex gap-8">
-            <div className="w-72 shrink-0">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)] p-4">
+        <div className="card max-w-3xl w-full">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+            <div className="w-full md:w-72 shrink-0">
               <div className="skeleton h-6 w-32 mb-3" />
               <div className="skeleton h-4 w-48 mb-2" />
               <div className="skeleton h-4 w-24" />
@@ -143,11 +143,11 @@ export default function PublicBookingPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)] p-3 sm:p-4">
       <div className="card max-w-4xl w-full overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Left Panel — Event Details */}
-          <div className="w-full md:w-72 shrink-0 p-6 md:border-r border-b md:border-b-0 border-[var(--border)]">
+          <div className="w-full md:w-72 shrink-0 p-5 sm:p-6 md:border-r border-b md:border-b-0 border-[var(--border)]">
             {/* Host info */}
             <div className="flex items-center gap-3 mb-5">
               <div
@@ -163,7 +163,7 @@ export default function PublicBookingPage() {
               </div>
             </div>
 
-            <h1 className="text-xl font-bold text-[var(--text-primary)] mb-3 m-0">
+            <h1 className="text-lg sm:text-xl font-bold text-[var(--text-primary)] mb-3 m-0">
               {eventType.name}
             </h1>
 
@@ -186,7 +186,9 @@ export default function PublicBookingPage() {
                     <line x1="8" y1="2" x2="8" y2="6" />
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
-                  {format(new Date(selectedSlot.start), 'h:mm a, EEEE, MMMM d, yyyy')}
+                  <span className="break-words">
+                    {format(new Date(selectedSlot.start), 'h:mm a, EEEE, MMMM d, yyyy')}
+                  </span>
                 </div>
               )}
 
@@ -203,7 +205,7 @@ export default function PublicBookingPage() {
           </div>
 
           {/* Right Panel — Calendar / Slots / Form */}
-          <div className="flex-1 p-6">
+          <div className="flex-1 p-5 sm:p-6">
             {showForm && selectedSlot ? (
               // Step 3: Booking Form
               <BookingForm
@@ -214,9 +216,9 @@ export default function PublicBookingPage() {
               />
             ) : (
               // Step 1 & 2: Calendar + Slots
-              <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex flex-col lg:flex-row gap-6">
                 {/* Calendar */}
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-3">
                     Select a Date
                   </h3>
@@ -228,7 +230,7 @@ export default function PublicBookingPage() {
 
                 {/* Time Slots */}
                 {selectedDate && (
-                  <div className="w-full md:w-52 animate-slide-in">
+                  <div className="w-full lg:w-52 animate-slide-in">
                     <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-3">
                       {format(selectedDate, 'EEEE, MMMM d')}
                     </h3>

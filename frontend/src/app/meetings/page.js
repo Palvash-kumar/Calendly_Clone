@@ -41,7 +41,7 @@ export default function MeetingsPage() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto">
       <Header
         title="Meetings"
         subtitle="View and manage your scheduled meetings"
@@ -73,10 +73,10 @@ export default function MeetingsPage() {
           {[1, 2, 3].map((i) => (
             <div key={i} className="card">
               <div className="flex items-center gap-4">
-                <div className="skeleton w-12 h-12 rounded-xl" />
-                <div className="flex-1">
-                  <div className="skeleton h-5 w-48 mb-2" />
-                  <div className="skeleton h-4 w-32" />
+                <div className="skeleton w-12 h-12 rounded-xl shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="skeleton h-5 w-3/4 mb-2" />
+                  <div className="skeleton h-4 w-1/2" />
                 </div>
               </div>
             </div>
@@ -86,7 +86,7 @@ export default function MeetingsPage() {
 
       {/* Empty State */}
       {!loading && bookings.length === 0 && (
-        <div className="card text-center py-16">
+        <div className="card text-center py-12 sm:py-16">
           <div className="w-16 h-16 rounded-2xl bg-[var(--bg-tertiary)] flex items-center justify-center mx-auto mb-4">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -115,26 +115,26 @@ export default function MeetingsPage() {
               className="card animate-fade-in hover:shadow-md"
               style={{ animationDelay: `${i * 50}ms` }}
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 {/* Left side */}
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 sm:gap-4 min-w-0">
                   {/* Color accent */}
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-white text-sm font-bold"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 text-white text-sm font-bold"
                     style={{ backgroundColor: booking.eventType?.color || '#006BFF' }}
                   >
                     {booking.name?.charAt(0)?.toUpperCase()}
                   </div>
 
-                  <div>
-                    <h3 className="text-base font-semibold text-[var(--text-primary)] m-0 mb-1">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] m-0 mb-1 truncate">
                       {booking.name}
                     </h3>
-                    <p className="text-sm text-[var(--text-secondary)] m-0 mb-2">
+                    <p className="text-sm text-[var(--text-secondary)] m-0 mb-2 truncate">
                       {booking.email}
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)]">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-[var(--text-muted)]">
                       {/* Event type */}
                       <span className="badge badge-blue">
                         {booking.eventType?.name}
@@ -172,7 +172,7 @@ export default function MeetingsPage() {
                 {activeTab === 'upcoming' && booking.status === 'scheduled' && (
                   <button
                     onClick={() => handleCancel(booking.id)}
-                    className="btn btn-danger btn-sm shrink-0"
+                    className="btn btn-danger btn-sm shrink-0 self-start sm:self-auto"
                     id={`cancel-booking-${booking.id}`}
                   >
                     Cancel

@@ -96,6 +96,11 @@ h1, h2, h3, h4, h5, h6 {
   100% { stroke-dashoffset: 0; }
 }
 
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
@@ -200,9 +205,15 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--bg-primary);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 24px;
+  padding: 16px;
   box-shadow: var(--shadow-sm);
   transition: all 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .card {
+    padding: 24px;
+  }
 }
 
 .card:hover {
@@ -341,6 +352,7 @@ h1, h2, h3, h4, h5, h6 {
   position: fixed;
   bottom: 24px;
   right: 24px;
+  left: 24px;
   padding: 14px 20px;
   border-radius: var(--radius-md);
   color: white;
@@ -349,6 +361,13 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 100;
   animation: slideInRight 0.3s ease forwards;
   box-shadow: var(--shadow-lg);
+}
+
+@media (min-width: 640px) {
+  .toast {
+    left: auto;
+    max-width: 400px;
+  }
 }
 
 .toast-success {

@@ -111,7 +111,7 @@ export default function AvailabilityPage() {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto">
       <Header
         title="Availability"
         subtitle="Set your weekly hours when you're available for meetings"
@@ -158,10 +158,12 @@ export default function AvailabilityPage() {
         <div className="flex flex-col gap-0">
           {loading
             ? Array.from({ length: 7 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 py-4 border-b border-[var(--border)] last:border-0">
-                  <div className="skeleton w-11 h-6 rounded-full" />
-                  <div className="skeleton h-4 w-24" />
-                  <div className="flex-1 flex items-center gap-3">
+                <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 py-4 border-b border-[var(--border)] last:border-0">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="skeleton w-11 h-6 rounded-full" />
+                    <div className="skeleton h-4 w-24" />
+                  </div>
+                  <div className="flex-1 flex items-center gap-3 pl-14 sm:pl-0">
                     <div className="skeleton h-10 flex-1" />
                     <div className="skeleton h-10 flex-1" />
                   </div>
@@ -170,28 +172,28 @@ export default function AvailabilityPage() {
             : schedule.map((day) => (
                 <div
                   key={day.dayOfWeek}
-                  className={`flex items-center gap-4 py-4 border-b border-[var(--border)] last:border-0 transition-opacity duration-200 ${
+                  className={`flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 py-4 border-b border-[var(--border)] last:border-0 transition-opacity duration-200 ${
                     !day.enabled ? 'opacity-50' : ''
                   }`}
                 >
-                  {/* Toggle */}
-                  <button
-                    className={`toggle ${day.enabled ? 'active' : ''}`}
-                    onClick={() => handleToggle(day.dayOfWeek)}
-                    id={`toggle-day-${day.dayOfWeek}`}
-                    aria-label={`Toggle ${DAY_NAMES[day.dayOfWeek]}`}
-                  />
-
-                  {/* Day name */}
-                  <span className="w-28 text-sm font-medium text-[var(--text-primary)]">
-                    {DAY_NAMES[day.dayOfWeek]}
-                  </span>
+                  {/* Toggle + Day name row */}
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <button
+                      className={`toggle ${day.enabled ? 'active' : ''}`}
+                      onClick={() => handleToggle(day.dayOfWeek)}
+                      id={`toggle-day-${day.dayOfWeek}`}
+                      aria-label={`Toggle ${DAY_NAMES[day.dayOfWeek]}`}
+                    />
+                    <span className="w-28 text-sm font-medium text-[var(--text-primary)]">
+                      {DAY_NAMES[day.dayOfWeek]}
+                    </span>
+                  </div>
 
                   {/* Time pickers */}
                   {day.enabled ? (
-                    <div className="flex-1 flex items-center gap-3">
+                    <div className="flex-1 flex items-center gap-3 pl-14 sm:pl-0">
                       <select
-                        className="input flex-1"
+                        className="input flex-1 min-w-0"
                         value={day.startTime}
                         onChange={(e) => handleTimeChange(day.dayOfWeek, 'startTime', e.target.value)}
                         id={`start-time-${day.dayOfWeek}`}
@@ -203,10 +205,10 @@ export default function AvailabilityPage() {
                         ))}
                       </select>
 
-                      <span className="text-[var(--text-muted)] text-sm">to</span>
+                      <span className="text-[var(--text-muted)] text-sm shrink-0">to</span>
 
                       <select
-                        className="input flex-1"
+                        className="input flex-1 min-w-0"
                         value={day.endTime}
                         onChange={(e) => handleTimeChange(day.dayOfWeek, 'endTime', e.target.value)}
                         id={`end-time-${day.dayOfWeek}`}
@@ -219,7 +221,7 @@ export default function AvailabilityPage() {
                       </select>
                     </div>
                   ) : (
-                    <span className="text-sm text-[var(--text-muted)] italic">
+                    <span className="text-sm text-[var(--text-muted)] italic pl-14 sm:pl-0">
                       Unavailable
                     </span>
                   )}

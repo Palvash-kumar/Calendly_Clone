@@ -59,9 +59,9 @@ export default function EventTypeModal({ isOpen, onClose, onSave, eventType }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content mx-3 sm:mx-auto" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="px-6 py-5 border-b border-[var(--border)]">
+        <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-[var(--border)]">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold m-0">
               {isEditing ? 'Edit Event Type' : 'New Event Type'}
@@ -80,7 +80,7 @@ export default function EventTypeModal({ isOpen, onClose, onSave, eventType }) {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6">
           <div className="flex flex-col gap-5">
             {/* Event Name */}
             <div>
@@ -100,7 +100,7 @@ export default function EventTypeModal({ isOpen, onClose, onSave, eventType }) {
             {/* Duration */}
             <div>
               <label className="label" htmlFor="event-duration">Duration (minutes)</label>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 {[15, 30, 45, 60].map((d) => (
                   <button
                     key={d}
@@ -131,7 +131,7 @@ export default function EventTypeModal({ isOpen, onClose, onSave, eventType }) {
             <div>
               <label className="label" htmlFor="event-slug">URL Slug</label>
               <div className="flex items-center gap-0">
-                <span className="px-3 py-2.5 bg-[var(--bg-tertiary)] border border-r-0 border-[var(--border)] rounded-l-[var(--radius-md)] text-sm text-[var(--text-muted)]">
+                <span className="px-2 sm:px-3 py-2.5 bg-[var(--bg-tertiary)] border border-r-0 border-[var(--border)] rounded-l-[var(--radius-md)] text-xs sm:text-sm text-[var(--text-muted)] shrink-0">
                   /event/
                 </span>
                 <input
@@ -168,7 +168,7 @@ export default function EventTypeModal({ isOpen, onClose, onSave, eventType }) {
           </div>
 
           {/* Footer */}
-          <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-[var(--border)]">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6 pt-5 border-t border-[var(--border)]">
             <button
               type="button"
               onClick={onClose}
