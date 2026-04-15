@@ -12,9 +12,11 @@ datasource db {
 
 /// Default admin user — the system seeds a single user
 model User {
-  id    Int    @id @default(autoincrement())
-  name  String
-  email String @unique
+  id       Int     @id @default(autoincrement())
+  name     String
+  email    String  @unique
+  googleId String? @unique @map("google_id")
+  avatar   String?
 
   eventTypes   EventType[]
   availability Availability[]

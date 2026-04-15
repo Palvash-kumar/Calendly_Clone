@@ -6,8 +6,9 @@ import EventTypeCard from '@/components/dashboard/EventTypeCard';
 import EventTypeModal from '@/components/dashboard/EventTypeModal';
 import Toast from '@/components/layout/Toast';
 import { eventTypeAPI } from '@/services/api';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   const [eventTypes, setEventTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -153,3 +154,12 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+export default function DashboardPage() {
+  return (
+    <ProtectedRoute>
+      <DashboardPageContent />
+    </ProtectedRoute>
+  );
+}
+

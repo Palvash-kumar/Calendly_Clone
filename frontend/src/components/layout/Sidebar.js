@@ -3,8 +3,21 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { getUser, logout } from '@/utils/auth';
 
 const navItems = [
+  {
+    label: 'Dashboard',
+    href: '/dashboard',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" />
+      </svg>
+    ),
+  },
   {
     label: 'Event Types',
     href: '/',
@@ -39,14 +52,33 @@ const navItems = [
       </svg>
     ),
   },
+  {
+    label: 'Profile',
+    href: '/profile',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    ),
+  },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
-  // Hide sidebar on public booking pages
+  // Hide sidebar on public booking pages and login page
   const isPublicPage = pathname.startsWith('/event/');
+  const isLoginPage = pathname === '/login';
+
+  useEffect(() => {
+    setMounted(true);
+    const currentUser = getUser();
+    setUser(currentUser);
+  }, [pathname]);
   
   // Close mobile drawer on route change
   useEffect(() => {
@@ -63,13 +95,23 @@ export default function Sidebar() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
-  if (isPublicPage) return null;
+  if (isPublicPage || isLoginPage) return null;
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  // Derive display info from user token
+  const userEmail = user?.email || 'User';
+  const userAvatar = user?.avatar || null;
+  const userInitial = (user?.name || userEmail).charAt(0).toUpperCase();
+  const userName = user?.name || userEmail.split('@')[0] || 'User';
 
   const sidebarContent = (
     <>
       {/* Logo */}
       <div className="px-6 py-5 border-b border-[var(--border)]">
-        <Link href="/" className="flex items-center gap-2.5 no-underline" onClick={() => setMobileOpen(false)}>
+        <Link href="/dashboard" className="flex items-center gap-2.5 no-underline" onClick={() => setMobileOpen(false)}>
           <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -111,17 +153,42 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      {/* Footer */}
-      <div className="px-6 py-4 border-t border-[var(--border)]">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-[var(--primary)] flex items-center justify-center text-white text-sm font-semibold">
-            A
+      {/* Footer — User info + Logout */}
+      <div className="px-4 py-4 border-t border-[var(--border)]">
+        <Link href="/profile" className="flex items-center gap-3 mb-3 px-2 no-underline hover:opacity-80 transition-opacity" onClick={() => setMobileOpen(false)}>
+          {mounted && userAvatar ? (
+            <img
+              src={userAvatar}
+              alt={userName}
+              className="w-9 h-9 rounded-full object-cover shrink-0"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-[var(--primary)] flex items-center justify-center text-white text-sm font-semibold shrink-0">
+              {mounted ? userInitial : 'U'}
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-[var(--text-primary)] m-0 truncate">
+              {mounted ? userName : 'Loading...'}
+            </p>
+            <p className="text-xs text-[var(--text-muted)] m-0 truncate">
+              {mounted ? userEmail : ''}
+            </p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-[var(--text-primary)] m-0">Admin User</p>
-            <p className="text-xs text-[var(--text-muted)] m-0">admin@calendly-clone.com</p>
-          </div>
-        </div>
+        </Link>
+        <button
+          onClick={handleLogout}
+          id="sidebar-logout-btn"
+          className="w-full flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-secondary)] hover:bg-red-50 hover:text-red-600 transition-all duration-200 cursor-pointer bg-transparent border-none text-left"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+            <polyline points="16,17 21,12 16,7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Logout
+        </button>
       </div>
     </>
   );
@@ -142,7 +209,7 @@ export default function Sidebar() {
             <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         </button>
-        <Link href="/" className="flex items-center gap-2 no-underline ml-2">
+        <Link href="/dashboard" className="flex items-center gap-2 no-underline ml-2">
           <div className="w-7 h-7 rounded-lg bg-[var(--primary)] flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />

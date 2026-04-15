@@ -5,8 +5,9 @@ import Header from '@/components/layout/Header';
 import Toast from '@/components/layout/Toast';
 import { bookingAPI } from '@/services/api';
 import { formatDate, formatTime, formatTimeRange, getRelativeDateLabel } from '@/utils/dateUtils';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
-export default function MeetingsPage() {
+function MeetingsPageContent() {
   const [activeTab, setActiveTab] = useState('upcoming');
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -190,5 +191,13 @@ export default function MeetingsPage() {
         onClose={() => setToast(null)}
       />
     </div>
+  );
+}
+
+export default function MeetingsPage() {
+  return (
+    <ProtectedRoute>
+      <MeetingsPageContent />
+    </ProtectedRoute>
   );
 }

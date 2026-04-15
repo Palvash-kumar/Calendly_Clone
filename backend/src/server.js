@@ -2,12 +2,15 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const passport = require('./config/passport');
 const errorHandler = require('./middleware/errorHandler');
 
 // Route imports
+const authRoutes = require('./routes/authRoutes');
 const eventTypeRoutes = require('./routes/eventTypeRoutes');
 const availabilityRoutes = require('./routes/availabilityRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
+const profileRoutes = require('./routes/profileRoutes');
 const publicRoutes = require('./routes/publicRoutes');
 const publicController = require('./controllers/publicController');
 
@@ -20,6 +23,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use(passport.initialize());
 
 // Request logging in development
 if (process.env.NODE_ENV !== 'production') {
@@ -36,10 +40,14 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Calendly Clone API is running', timestamp: new Date().toISOString() });
 });
 
+// Auth routes
+app.use('/api/auth', authRoutes);
+
 // Admin routes
 app.use('/api/event-types', eventTypeRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Public routes
 app.use('/api/event', publicRoutes);

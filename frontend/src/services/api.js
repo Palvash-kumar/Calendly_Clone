@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getToken, removeToken } from '@/utils/auth';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
@@ -9,6 +10,29 @@ const api = axios.create({
   },
   timeout: 10000,
 });
+
+// ─── Request Interceptor: Attach JWT token ───────────────
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// ─── Response Interceptor: Handle 401 (expired/invalid token) ──
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      removeToken();
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 // ─── Event Types ──────────────────────────────────────────
 export const eventTypeAPI = {
@@ -36,6 +60,25 @@ export const publicAPI = {
 export const bookingAPI = {
   getAll: (type = 'upcoming') => api.get('/bookings', { params: { type } }),
   cancel: (id) => api.patch(`/bookings/${id}/cancel`),
+};
+
+// ─── Auth ─────────────────────────────────────────────────
+export const authAPI = {
+  getMe: () => api.get('/auth/me'),
+};
+
+// ─── Profile ──────────────────────────────────────────────
+export const profileAPI = {
+  get: () => api.get('/profile'),
+  update: (data) => api.put('/profile', data),
+  uploadAvatar: (file) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return api.post('/profile/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  removeAvatar: () => api.delete('/profile/avatar'),
 };
 
 export default api;

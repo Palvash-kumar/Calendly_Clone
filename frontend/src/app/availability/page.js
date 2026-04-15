@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Toast from '@/components/layout/Toast';
 import { availabilityAPI } from '@/services/api';
 import { DAY_NAMES } from '@/utils/dateUtils';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 /**
  * Generate time options in 30-minute increments.
@@ -37,7 +38,7 @@ const DEFAULT_SCHEDULE = DAY_NAMES.map((_, i) => ({
   endTime: '17:00',
 }));
 
-export default function AvailabilityPage() {
+function AvailabilityPageContent() {
   const [schedule, setSchedule] = useState(DEFAULT_SCHEDULE);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -237,5 +238,13 @@ export default function AvailabilityPage() {
         onClose={() => setToast(null)}
       />
     </div>
+  );
+}
+
+export default function AvailabilityPage() {
+  return (
+    <ProtectedRoute>
+      <AvailabilityPageContent />
+    </ProtectedRoute>
   );
 }
