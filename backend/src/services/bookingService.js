@@ -1,5 +1,6 @@
 const prisma = require('../config/db');
 const { NotFoundError, ConflictError, BadRequestError } = require('../utils/errors');
+const emailService = require('./emailService');
 
 /**
  * Service layer for Booking management.
@@ -37,7 +38,7 @@ const bookingService = {
     if (!eventType) throw new NotFoundError('Event type not found');
 
     // Use transaction for atomic check-and-create
-    return prisma.$transaction(async (tx) => {
+    const booking = await prisma.$transaction(async (tx) => {
       // Check for overlapping bookings
       // Overlap condition: existing.start < new.end AND existing.end > new.start
       const overlap = await tx.booking.findFirst({
@@ -70,6 +71,24 @@ const bookingService = {
         },
       });
     });
+
+    // Send confirmation emails (non-blocking, won't break the booking)
+    try {
+      // Look up the host user for this event type
+      const eventWithUser = await prisma.eventType.findUnique({
+        where: { id: parseInt(eventTypeId) },
+        include: { user: true },
+      });
+      const hostEmail = eventWithUser?.user?.email;
+      if (hostEmail) {
+        // Fire and forget — don't await to keep the response fast
+        emailService.sendBookingConfirmation(booking, hostEmail);
+      }
+    } catch (emailErr) {
+      console.error('Email send error (non-critical):', emailErr.message);
+    }
+
+    return booking;
   },
 
   /**

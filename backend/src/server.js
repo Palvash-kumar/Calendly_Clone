@@ -61,10 +61,15 @@ app.use((req, res) => {
 // ─── Error Handler ────────────────────────────────────────
 app.use(errorHandler);
 
+const { startReminderScheduler } = require('./services/reminderScheduler');
+
 // ─── Start Server ─────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`\n🚀 Calendly Clone API running on http://localhost:${PORT}`);
   console.log(`📋 Health check: http://localhost:${PORT}/api/health\n`);
+
+  // Start the 30-minute reminder cron job
+  startReminderScheduler();
 });
 
 module.exports = app;
