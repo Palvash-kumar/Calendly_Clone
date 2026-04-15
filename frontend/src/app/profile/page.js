@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { profileAPI } from '@/services/api';
 import { getUser, getToken, setToken } from '@/utils/auth';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import ImageCropModal from '@/components/profile/ImageCropModal';
 
 function ProfileContent() {
   const [profile, setProfile] = useState(null);
@@ -13,6 +14,7 @@ function ProfileContent() {
   const [name, setName] = useState('');
   const [toast, setToast] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState(null); // Data URL for crop modal
   const fileInputRef = useRef(null);
 
   // Load profile on mount
@@ -74,7 +76,11 @@ function ProfileContent() {
     }
   };
 
-  const handleFileSelect = async (file) => {
+  /**
+   * When user selects a file, validate it, read it as a data URL,
+   * and open the crop modal — NOT upload immediately.
+   */
+  const handleFileSelect = (file) => {
     if (!file) return;
 
     // Validate file type
@@ -90,9 +96,28 @@ function ProfileContent() {
       return;
     }
 
+    // Read file as data URL and open crop modal
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropImageSrc(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Reset file input so the same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  /**
+   * Called when user confirms the crop in the modal.
+   * Receives a cropped Blob, converts it to a File, and uploads.
+   */
+  const handleCropConfirm = useCallback(async (croppedBlob) => {
+    setCropImageSrc(null); // close modal immediately
     try {
       setUploading(true);
-      const res = await profileAPI.uploadAvatar(file);
+      // Convert Blob to File for the FormData upload
+      const croppedFile = new File([croppedBlob], 'avatar.png', { type: 'image/png' });
+      const res = await profileAPI.uploadAvatar(croppedFile);
       setProfile(res.data.data);
       await refreshToken();
       showToast('Profile picture updated!');
@@ -101,7 +126,14 @@ function ProfileContent() {
     } finally {
       setUploading(false);
     }
-  };
+  }, []);
+
+  /**
+   * Called when user cancels the crop modal.
+   */
+  const handleCropCancel = useCallback(() => {
+    setCropImageSrc(null);
+  }, []);
 
   const handleRemoveAvatar = async () => {
     try {
@@ -429,6 +461,15 @@ function ProfileContent() {
             {toast.message}
           </div>
         </div>
+      )}
+
+      {/* ── Image Crop Modal ── */}
+      {cropImageSrc && (
+        <ImageCropModal
+          imageSrc={cropImageSrc}
+          onConfirm={handleCropConfirm}
+          onCancel={handleCropCancel}
+        />
       )}
     </div>
   );

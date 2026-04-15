@@ -15,7 +15,7 @@ async function main() {
   const user = await prisma.user.create({
     data: {
       name: 'Admin User',
-      email: 'admin@calendly-clone.com',
+      email: 'palvash2005@gmail.com',
     },
   });
   console.log(`✅ Created user: ${user.name}`);
