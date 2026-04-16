@@ -7,6 +7,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.use(authMiddleware);
 
 router.get('/', bookingController.getAll);
+router.get('/:id/calendar.ics', bookingController.downloadICS);
 router.patch('/:id/cancel', bookingController.cancel);
 
 module.exports = router;

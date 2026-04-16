@@ -2,14 +2,22 @@
 
 import { useState } from 'react';
 
+const KIND_LABELS = {
+  'one-on-one': { label: 'One-on-one', color: '#006BFF', bg: '#EFF6FF' },
+  'group': { label: 'Group', color: '#059669', bg: '#ECFDF5' },
+  'round-robin': { label: 'Round Robin', color: '#D97706', bg: '#FFFBEB' },
+  'collective': { label: 'Collective', color: '#7C3AED', bg: '#F5F3FF' },
+};
+
 /**
  * Event type card for the dashboard grid.
- * Shows event name, duration, slug, and provides edit/delete/copy-link actions.
+ * Shows event name, kind, duration, slug, and provides edit/delete/copy-link actions.
  */
 export default function EventTypeCard({ eventType, onEdit, onDelete }) {
   const [copied, setCopied] = useState(false);
 
   const bookingUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/event/${eventType.slug}`;
+  const kindInfo = KIND_LABELS[eventType.kind] || KIND_LABELS['one-on-one'];
 
   const handleCopyLink = async () => {
     try {
@@ -51,8 +59,17 @@ export default function EventTypeCard({ eventType, onEdit, onDelete }) {
           </div>
         </div>
 
-        {/* Duration badge */}
-        <div className="flex items-center gap-2 mb-4">
+        {/* Badges */}
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          {/* Event kind badge */}
+          <span
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium"
+            style={{ backgroundColor: kindInfo.bg, color: kindInfo.color }}
+          >
+            {kindInfo.label}
+          </span>
+
+          {/* Duration */}
           <span className="badge badge-blue">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="mr-1">
               <circle cx="12" cy="12" r="10" />
@@ -60,6 +77,22 @@ export default function EventTypeCard({ eventType, onEdit, onDelete }) {
             </svg>
             {eventType.duration} min
           </span>
+
+          {/* Group: max invitees */}
+          {eventType.kind === 'group' && (
+            <span className="badge" style={{ background: '#ECFDF5', color: '#059669' }}>
+              Max {eventType.maxInvitees}
+            </span>
+          )}
+
+          {/* Co-hosts count */}
+          {(eventType.kind === 'round-robin' || eventType.kind === 'collective') && eventType.coHosts?.length > 0 && (
+            <span className="badge" style={{ background: '#F5F3FF', color: '#7C3AED' }}>
+              {eventType.coHosts.length + 1} hosts
+            </span>
+          )}
+
+          {/* Booking count */}
           {eventType._count?.bookings > 0 && (
             <span className="badge badge-gray">
               {eventType._count.bookings} booking{eventType._count.bookings !== 1 ? 's' : ''}

@@ -49,9 +49,12 @@ app.use('/api/availability', availabilityRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/profile', profileRoutes);
 
-// Public routes
+// Public routes (event details and slots — no auth required)
 app.use('/api/event', publicRoutes);
-app.post('/api/book', publicController.book);
+
+// Booking route — requires auth (invitee must be logged in)
+const authMiddleware = require('./middleware/authMiddleware');
+app.post('/api/book', authMiddleware, publicController.book);
 
 // 404 handler
 app.use((req, res) => {

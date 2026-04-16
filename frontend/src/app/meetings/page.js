@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Header from '@/components/layout/Header';
 import Toast from '@/components/layout/Toast';
 import { bookingAPI } from '@/services/api';
 import { formatDate, formatTime, formatTimeRange, getRelativeDateLabel } from '@/utils/dateUtils';
+import { getGoogleCalendarUrl, getOutlookCalendarUrl, downloadICSFile } from '@/utils/calendarUtils';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 function MeetingsPageContent() {
@@ -128,9 +129,35 @@ function MeetingsPageContent() {
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] m-0 mb-1 truncate">
-                      {booking.name}
-                    </h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-sm sm:text-base font-semibold text-[var(--text-primary)] m-0 truncate">
+                        {booking.name}
+                      </h3>
+                      {/* Role badge */}
+                      {booking.role === 'host' ? (
+                        <span className="badge badge-blue" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>
+                          Host
+                        </span>
+                      ) : booking.role === 'co-host' ? (
+                        <span className="badge" style={{
+                          fontSize: '0.65rem',
+                          padding: '2px 6px',
+                          background: '#FFFBEB',
+                          color: '#D97706',
+                        }}>
+                          Co-Host
+                        </span>
+                      ) : (
+                        <span className="badge" style={{
+                          fontSize: '0.65rem',
+                          padding: '2px 6px',
+                          background: '#F3E8FF',
+                          color: '#7C3AED',
+                        }}>
+                          Invitee
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-[var(--text-secondary)] m-0 mb-2 truncate">
                       {booking.email}
                     </p>
@@ -169,15 +196,23 @@ function MeetingsPageContent() {
                   </div>
                 </div>
 
-                {/* Cancel button (only for upcoming & scheduled) */}
-                {activeTab === 'upcoming' && booking.status === 'scheduled' && (
-                  <button
-                    onClick={() => handleCancel(booking.id)}
-                    className="btn btn-danger btn-sm shrink-0 self-start sm:self-auto"
-                    id={`cancel-booking-${booking.id}`}
-                  >
-                    Cancel
-                  </button>
+                {/* Action buttons */}
+                {booking.status === 'scheduled' && (
+                  <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                    {/* Add to Calendar dropdown */}
+                    <CalendarDropdown booking={booking} />
+
+                    {/* Cancel button (only for upcoming) */}
+                    {activeTab === 'upcoming' && (
+                      <button
+                        onClick={() => handleCancel(booking.id)}
+                        className="btn btn-danger btn-sm"
+                        id={`cancel-booking-${booking.id}`}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -190,6 +225,84 @@ function MeetingsPageContent() {
         type={toast?.type}
         onClose={() => setToast(null)}
       />
+    </div>
+  );
+}
+
+/**
+ * Calendar dropdown for adding a booking to external calendars.
+ */
+function CalendarDropdown({ booking }) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    if (open) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
+  const calendarData = {
+    title: `${booking.eventType?.name || 'Meeting'} — ${booking.name}`,
+    startTime: booking.startTime,
+    endTime: booking.endTime,
+    description: `Meeting: ${booking.eventType?.name || 'Meeting'}\nWith: ${booking.name} (${booking.email})\nDuration: ${booking.eventType?.duration || 30} min`,
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="btn btn-secondary btn-sm"
+        id={`cal-btn-${booking.id}`}
+        title="Add to Calendar"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <span className="hidden sm:inline">Calendar</span>
+      </button>
+
+      {open && (
+        <div
+          className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-[var(--border)] py-1 z-50 min-w-[180px] animate-fade-in"
+        >
+          <a
+            href={getGoogleCalendarUrl(calendarData)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors no-underline"
+            onClick={() => setOpen(false)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4285F4" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+            Google Calendar
+          </a>
+          <a
+            href={getOutlookCalendarUrl(calendarData)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors no-underline"
+            onClick={() => setOpen(false)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0078D4" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+            Outlook Calendar
+          </a>
+          <button
+            onClick={() => { downloadICSFile(calendarData); setOpen(false); }}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors w-full text-left bg-transparent border-none cursor-pointer"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7,10 12,15 17,10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+            Download .ics
+          </button>
+        </div>
+      )}
     </div>
   );
 }

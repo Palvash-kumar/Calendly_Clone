@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { getGoogleCalendarUrl, getOutlookCalendarUrl } = require('../utils/calendarUtils');
 
 /**
  * Email Service — Sends booking confirmations and reminders via Gmail SMTP.
@@ -138,6 +139,25 @@ const emailService = {
     const startStr = formatTime(booking.startTime);
     const endStr = formatTime(booking.endTime);
 
+    // Generate calendar URLs
+    const calendarTitle = `${eventName} — ${booking.name}`;
+    const calendarDesc = `Meeting: ${eventName}\nWith: ${booking.name} (${booking.email})\nDuration: ${duration} min`;
+    const googleCalUrl = getGoogleCalendarUrl({ title: calendarTitle, startTime: booking.startTime, endTime: booking.endTime, description: calendarDesc });
+    const outlookCalUrl = getOutlookCalendarUrl({ title: calendarTitle, startTime: booking.startTime, endTime: booking.endTime, description: calendarDesc });
+
+    const calendarButtons = `
+      <div style="margin-top:24px;text-align:center;">
+        <p style="margin:0 0 12px;font-size:13px;color:#6b7280;font-weight:600;">Add to your calendar:</p>
+        <div>
+          <a href="${googleCalUrl}" target="_blank" style="display:inline-block;padding:10px 20px;background:#006BFF;color:#ffffff;text-decoration:none;border-radius:8px;font-size:13px;font-weight:600;margin:0 6px 8px;">
+            📅 Google Calendar
+          </a>
+          <a href="${outlookCalUrl}" target="_blank" style="display:inline-block;padding:10px 20px;background:#0078D4;color:#ffffff;text-decoration:none;border-radius:8px;font-size:13px;font-weight:600;margin:0 6px 8px;">
+            📅 Outlook
+          </a>
+        </div>
+      </div>`;
+
     // ── Email to INVITEE ──
     const inviteeBody = `
       <p style="font-size:15px;color:#374151;margin:0 0 20px;line-height:1.6;">
@@ -146,7 +166,8 @@ const emailService = {
       ${detailRow(icons.event, 'Event', eventName)}
       ${detailRow(icons.calendar, 'Date', dateStr)}
       ${detailRow(icons.clock, 'Time', `${startStr} – ${endStr} IST (${duration} min)`)}
-      <div style="margin-top:24px;padding:16px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;">
+      ${calendarButtons}
+      <div style="margin-top:16px;padding:16px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;">
         <p style="margin:0;font-size:13px;color:#166534;font-weight:500;">
           ✅ You'll receive a reminder 30 minutes before your meeting.
         </p>
@@ -167,7 +188,8 @@ const emailService = {
       ${detailRow(icons.mail, 'Invitee Email', booking.email)}
       ${detailRow(icons.event, 'Event', eventName)}
       ${detailRow(icons.calendar, 'Date', dateStr)}
-      ${detailRow(icons.clock, 'Time', `${startStr} – ${endStr} IST (${duration} min)`)}`;
+      ${detailRow(icons.clock, 'Time', `${startStr} – ${endStr} IST (${duration} min)`)}
+      ${calendarButtons}`;;
 
     const hostHTML = buildEmailHTML({
       heading: '📅 New Booking Received',

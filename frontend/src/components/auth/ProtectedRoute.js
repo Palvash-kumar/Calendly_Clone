@@ -27,6 +27,7 @@ function AuthSpinner() {
 /**
  * Inner component that uses useSearchParams (requires Suspense boundary).
  * Captures any OAuth token from the URL, then checks authentication.
+ * Supports returnTo redirect after OAuth login.
  */
 function ProtectedRouteInner({ children }) {
   const router = useRouter();
@@ -41,6 +42,14 @@ function ProtectedRouteInner({ children }) {
       setToken(tokenFromUrl);
       // Clean the URL so the token isn't visible in the address bar
       window.history.replaceState({}, document.title, window.location.pathname);
+
+      // Check if there's a returnTo URL saved before the OAuth redirect
+      const returnTo = sessionStorage.getItem('returnTo');
+      if (returnTo) {
+        sessionStorage.removeItem('returnTo');
+        router.replace(returnTo);
+        return;
+      }
     }
 
     // 2. Now check if user is authenticated (token in localStorage)

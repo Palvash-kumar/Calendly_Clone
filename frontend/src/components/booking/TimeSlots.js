@@ -50,6 +50,11 @@ export default function TimeSlots({ slots, selectedSlot, onSelect, loading }) {
             id={`time-slot-${index}`}
           >
             {formatTime(slot.start)}
+            {slot.spotsLeft !== undefined && (
+              <span className={`block text-xs font-normal mt-0.5 ${isSelected ? 'text-white/80' : 'text-[var(--text-muted)]'}`}>
+                {slot.spotsLeft} spot{slot.spotsLeft !== 1 ? 's' : ''} left
+              </span>
+            )}
           </button>
         );
       })}

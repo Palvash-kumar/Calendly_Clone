@@ -4,17 +4,17 @@ import { useState } from 'react';
 import { formatDate, formatTime } from '@/utils/dateUtils';
 
 /**
- * Booking form — collects invitee name and email.
+ * Booking confirmation form — shows the logged-in user's info (read-only)
+ * and lets them confirm the booking.
  */
-export default function BookingForm({ selectedSlot, eventType, onSubmit, onBack }) {
-  const [formData, setFormData] = useState({ name: '', email: '' });
+export default function BookingForm({ selectedSlot, eventType, user, onSubmit, onBack }) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await onSubmit(formData);
+      await onSubmit();
     } catch (err) {
       console.error('Booking failed:', err);
     } finally {
@@ -46,62 +46,62 @@ export default function BookingForm({ selectedSlot, eventType, onSubmit, onBack 
         </div>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div>
-          <label className="label" htmlFor="invitee-name">Your Name *</label>
-          <input
-            id="invitee-name"
-            type="text"
-            className="input"
-            placeholder="John Doe"
-            value={formData.name}
-            onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-            required
-            autoFocus
-          />
+      {/* Invitee info (read-only, from logged-in user) */}
+      <div className="bg-[var(--bg-secondary)] rounded-xl p-4 mb-6">
+        <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-3">
+          Booking as
+        </p>
+        <div className="flex items-center gap-3">
+          {user?.avatar ? (
+            <img
+              src={user.avatar}
+              alt={user.name || 'User'}
+              className="w-10 h-10 rounded-full object-cover border border-[var(--border)]"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-white text-sm font-bold">
+              {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div>
+            <p className="text-sm font-semibold text-[var(--text-primary)] m-0">
+              {user?.name || 'User'}
+            </p>
+            <p className="text-xs text-[var(--text-muted)] m-0">
+              {user?.email || ''}
+            </p>
+          </div>
         </div>
+      </div>
 
-        <div>
-          <label className="label" htmlFor="invitee-email">Email Address *</label>
-          <input
-            id="invitee-email"
-            type="email"
-            className="input"
-            placeholder="john@example.com"
-            value={formData.email}
-            onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-            required
-          />
-        </div>
-
-        <div className="flex gap-3 mt-2">
-          <button
-            type="button"
-            onClick={onBack}
-            className="btn btn-secondary flex-1"
-            id="booking-back"
-          >
-            Back
-          </button>
-          <button
-            type="submit"
-            className="btn btn-primary flex-1"
-            disabled={loading || !formData.name || !formData.email}
-            id="confirm-booking"
-          >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                </svg>
-                Scheduling...
-              </span>
-            ) : (
-              'Schedule Event'
-            )}
-          </button>
-        </div>
+      {/* Confirm / Back buttons */}
+      <form onSubmit={handleSubmit} className="flex gap-3 mt-2">
+        <button
+          type="button"
+          onClick={onBack}
+          className="btn btn-secondary flex-1"
+          id="booking-back"
+        >
+          Back
+        </button>
+        <button
+          type="submit"
+          className="btn btn-primary flex-1"
+          disabled={loading}
+          id="confirm-booking"
+        >
+          {loading ? (
+            <span className="flex items-center gap-2">
+              <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              Scheduling...
+            </span>
+          ) : (
+            'Confirm Booking'
+          )}
+        </button>
       </form>
     </div>
   );
