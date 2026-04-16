@@ -158,6 +158,20 @@ const emailService = {
         </div>
       </div>`;
 
+    // Build location row for emails
+    const locationType = booking.eventType?.locationType;
+    const locationValue = booking.eventType?.locationValue;
+    const locationLabels = { 'google-meet': '🎥 Google Meet', 'teams': '💬 Microsoft Teams', 'zoom': '📹 Zoom', 'custom': '📍 In-Person' };
+    const locationLabel = locationLabels[locationType] || '';
+    const isLink = locationType && locationType !== 'custom' && locationType !== 'none' && locationValue;
+    const locationRowHTML = locationType && locationType !== 'none'
+      ? detailRow(
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#006BFF" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+          'Location',
+          isLink ? `${locationLabel} — <a href="${locationValue}" style="color:#006BFF;">${locationValue}</a>` : `${locationLabel}${locationValue ? ' — ' + locationValue : ''}`
+        )
+      : '';
+
     // ── Email to INVITEE ──
     const inviteeBody = `
       <p style="font-size:15px;color:#374151;margin:0 0 20px;line-height:1.6;">
@@ -166,6 +180,7 @@ const emailService = {
       ${detailRow(icons.event, 'Event', eventName)}
       ${detailRow(icons.calendar, 'Date', dateStr)}
       ${detailRow(icons.clock, 'Time', `${startStr} – ${endStr} IST (${duration} min)`)}
+      ${locationRowHTML}
       ${calendarButtons}
       <div style="margin-top:16px;padding:16px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;">
         <p style="margin:0;font-size:13px;color:#166534;font-weight:500;">
@@ -189,7 +204,8 @@ const emailService = {
       ${detailRow(icons.event, 'Event', eventName)}
       ${detailRow(icons.calendar, 'Date', dateStr)}
       ${detailRow(icons.clock, 'Time', `${startStr} – ${endStr} IST (${duration} min)`)}
-      ${calendarButtons}`;;
+      ${locationRowHTML}
+      ${calendarButtons}`;
 
     const hostHTML = buildEmailHTML({
       heading: '📅 New Booking Received',
@@ -367,6 +383,68 @@ const emailService = {
       console.log(`📧 Co-host invitation sent to ${coHostEmail} for "${eventName}"`);
     } catch (err) {
       console.error(`❌ Failed to send co-host invitation to ${coHostEmail}:`, err.message);
+    }
+  },
+
+  /**
+   * Send a location update email when the host changes the meeting location.
+   */
+  async sendLocationUpdate({ recipientEmail, recipientName, eventName, locationType, locationValue, hostName }) {
+    const transport = getTransporter();
+    if (!transport) return;
+
+    const locationLabels = {
+      'google-meet': 'Google Meet',
+      'teams': 'Microsoft Teams',
+      'zoom': 'Zoom',
+      'custom': 'In-Person / Custom',
+      'none': 'No location',
+    };
+    const locationLabel = locationLabels[locationType] || locationType;
+
+    const isLink = locationType !== 'custom' && locationType !== 'none' && locationValue;
+    const locationDisplay = isLink
+      ? `<a href="${locationValue}" style="color:#006BFF;text-decoration:none;font-weight:500;">${locationValue}</a>`
+      : (locationValue || 'Not specified');
+
+    const bodyHTML = `
+      <p style="font-size:15px;color:#374151;margin:0 0 20px;line-height:1.6;">
+        Hi <strong>${recipientName || 'there'}</strong>, the meeting location has been updated.
+      </p>
+      ${detailRow(icons.event, 'Event', eventName)}
+      ${detailRow(icons.user, 'Updated by', hostName)}
+      <div style="margin-top:20px;padding:16px;background:#eff6ff;border-radius:12px;border:1px solid #bfdbfe;">
+        <p style="margin:0 0 4px;font-size:12px;color:#1d4ed8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">
+          New Location — ${locationLabel}
+        </p>
+        <p style="margin:0;font-size:15px;color:#1e40af;word-break:break-all;">
+          ${locationDisplay}
+        </p>
+      </div>
+      ${isLink ? `
+      <div style="margin-top:24px;text-align:center;">
+        <a href="${locationValue}" target="_blank" style="display:inline-block;padding:12px 28px;background:#006BFF;color:#ffffff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">
+          Open Meeting Link
+        </a>
+      </div>` : ''}`;
+
+    const html = buildEmailHTML({
+      heading: '📍 Meeting Location Updated',
+      preheader: `The location for "${eventName}" has been changed to ${locationLabel}.`,
+      bodyHTML: bodyHTML,
+      accentColor: '#2563EB',
+    });
+
+    try {
+      await transport.sendMail({
+        from: `"Calendly Clone" <${process.env.SMTP_USER}>`,
+        to: recipientEmail,
+        subject: `📍 Location Updated: ${eventName}`,
+        html,
+      });
+      console.log(`📧 Location update sent to ${recipientEmail} for "${eventName}"`);
+    } catch (err) {
+      console.error(`❌ Failed to send location update to ${recipientEmail}:`, err.message);
     }
   },
 };

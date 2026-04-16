@@ -192,6 +192,22 @@ function MeetingsPageContent() {
                       {booking.status === 'cancelled' && (
                         <span className="badge badge-red">Cancelled</span>
                       )}
+
+                      {/* Location */}
+                      {booking.eventType?.locationType && booking.eventType.locationType !== 'none' && (
+                        <span className="flex items-center gap-1">
+                          {booking.eventType.locationType === 'google-meet' ? '🎥' :
+                           booking.eventType.locationType === 'teams' ? '💬' :
+                           booking.eventType.locationType === 'zoom' ? '📹' : '📍'}
+                          {booking.eventType.locationValue && booking.eventType.locationType !== 'custom' ? (
+                            <a href={booking.eventType.locationValue} target="_blank" rel="noopener noreferrer" className="text-[var(--primary)] hover:underline no-underline">
+                              Join
+                            </a>
+                          ) : (
+                            <span className="truncate max-w-[120px]">{booking.eventType.locationValue || (booking.eventType.locationType === 'custom' ? 'In-Person' : '')}</span>
+                          )}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

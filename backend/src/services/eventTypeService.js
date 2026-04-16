@@ -56,7 +56,7 @@ const eventTypeService = {
    * @param {number} userId - The authenticated user's ID
    */
   async create(data, userId) {
-    const { name, duration, slug, color, kind, maxInvitees, coHostEmails } = data;
+    const { name, duration, slug, color, kind, maxInvitees, coHostEmails, locationType, locationValue } = data;
 
     if (!name || !duration) {
       throw new BadRequestError('Name and duration are required');
@@ -112,6 +112,8 @@ const eventTypeService = {
           color: color || '#006BFF',
           kind: eventKind,
           maxInvitees: groupMax,
+          locationType: locationType || 'none',
+          locationValue: locationValue || '',
           userId,
         },
       });
@@ -161,17 +163,27 @@ const eventTypeService = {
   async update(id, data, userId) {
     const existing = await prisma.eventType.findFirst({
       where: { id: parseInt(id), userId },
+      include: {
+        coHosts: {
+          include: { user: { select: { id: true, name: true, email: true } } },
+        },
+      },
     });
     if (!existing) throw new NotFoundError('Event type not found');
 
-    const { name, duration, slug, color, kind, maxInvitees, coHostEmails } = data;
+    const { name, duration, slug, color, kind, maxInvitees, coHostEmails, locationType, locationValue } = data;
 
     const eventKind = kind || existing.kind;
     if (!VALID_KINDS.includes(eventKind)) {
       throw new BadRequestError(`Invalid event kind. Must be one of: ${VALID_KINDS.join(', ')}`);
     }
 
-    return prisma.$transaction(async (tx) => {
+    // Detect location change
+    const newLocationType = locationType !== undefined ? locationType : existing.locationType;
+    const newLocationValue = locationValue !== undefined ? locationValue : existing.locationValue;
+    const locationChanged = newLocationType !== existing.locationType || newLocationValue !== existing.locationValue;
+
+    const result = await prisma.$transaction(async (tx) => {
       const updated = await tx.eventType.update({
         where: { id: parseInt(id) },
         data: {
@@ -181,34 +193,26 @@ const eventTypeService = {
           ...(color && { color }),
           kind: eventKind,
           maxInvitees: eventKind === 'group' ? Math.max(2, parseInt(maxInvitees) || existing.maxInvitees) : 1,
+          locationType: newLocationType,
+          locationValue: newLocationValue,
         },
       });
 
       // Update co-hosts if provided
       if (coHostEmails !== undefined && (eventKind === 'round-robin' || eventKind === 'collective')) {
-        // Delete old co-hosts
         await tx.eventTypeCoHost.deleteMany({ where: { eventTypeId: parseInt(id) } });
-
-        // Resolve and create new co-hosts
         if (coHostEmails && coHostEmails.length > 0) {
           const coHostUsers = await tx.user.findMany({
-            where: {
-              email: { in: coHostEmails },
-              id: { not: userId },
-            },
+            where: { email: { in: coHostEmails }, id: { not: userId } },
             select: { id: true },
           });
           if (coHostUsers.length > 0) {
             await tx.eventTypeCoHost.createMany({
-              data: coHostUsers.map((u) => ({
-                eventTypeId: parseInt(id),
-                userId: u.id,
-              })),
+              data: coHostUsers.map((u) => ({ eventTypeId: parseInt(id), userId: u.id })),
             });
           }
         }
       } else if (eventKind === 'one-on-one' || eventKind === 'group') {
-        // Remove co-hosts if switching to a non-co-host kind
         await tx.eventTypeCoHost.deleteMany({ where: { eventTypeId: parseInt(id) } });
       }
 
@@ -223,6 +227,47 @@ const eventTypeService = {
         },
       });
     });
+
+    // If location changed, notify invitees and co-hosts
+    if (locationChanged) {
+      const hostUser = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+
+      // Get upcoming bookings for this event
+      const upcomingBookings = await prisma.booking.findMany({
+        where: {
+          eventTypeId: parseInt(id),
+          status: 'scheduled',
+          startTime: { gte: new Date() },
+        },
+        select: { email: true, name: true, inviteeId: true },
+      });
+
+      // Collect all emails to notify: invitees + co-hosts
+      const emailsToNotify = new Set();
+      const namesMap = {};
+      for (const b of upcomingBookings) {
+        emailsToNotify.add(b.email);
+        namesMap[b.email] = b.name;
+      }
+      for (const ch of (existing.coHosts || [])) {
+        emailsToNotify.add(ch.user.email);
+        namesMap[ch.user.email] = ch.user.name;
+      }
+
+      // Send notifications (non-blocking)
+      for (const email of emailsToNotify) {
+        emailService.sendLocationUpdate({
+          recipientEmail: email,
+          recipientName: namesMap[email] || '',
+          eventName: result.name,
+          locationType: newLocationType,
+          locationValue: newLocationValue,
+          hostName: hostUser?.name || 'The host',
+        }).catch((err) => console.error('Location update email error:', err.message));
+      }
+    }
+
+    return result;
   },
 
   /**

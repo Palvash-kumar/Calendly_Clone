@@ -90,10 +90,12 @@ export default function EventTypeModal({ isOpen, onClose, onSave, eventType }) {
         kind: eventType.kind || 'one-on-one',
         maxInvitees: eventType.maxInvitees || 2,
         coHostEmails: eventType.coHosts?.map((c) => c.user.email) || [],
+        locationType: eventType.locationType || 'none',
+        locationValue: eventType.locationValue || '',
       });
       setStep(2); // Skip kind selection when editing
     } else {
-      setFormData({ name: '', duration: 30, slug: '', color: '#006BFF', kind: 'one-on-one', maxInvitees: 2, coHostEmails: [] });
+      setFormData({ name: '', duration: 30, slug: '', color: '#006BFF', kind: 'one-on-one', maxInvitees: 2, coHostEmails: [], locationType: 'none', locationValue: '' });
       setStep(1);
     }
     setCoHostInput('');
@@ -361,6 +363,71 @@ export default function EventTypeModal({ isOpen, onClose, onSave, eventType }) {
                   )}
                 </div>
               )}
+
+              {/* Meeting Location */}
+              <div>
+                <label className="label">Meeting Location</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-2">
+                  {[
+                    { id: 'google-meet', label: 'Google Meet', icon: '🎥', color: '#1a73e8' },
+                    { id: 'teams', label: 'Teams', icon: '💬', color: '#5b5fc7' },
+                    { id: 'zoom', label: 'Zoom', icon: '📹', color: '#2d8cff' },
+                    { id: 'custom', label: 'In-Person', icon: '📍', color: '#059669' },
+                    { id: 'none', label: 'None', icon: '—', color: '#6b7280' },
+                  ].map((loc) => (
+                    <button
+                      key={loc.id}
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, locationType: loc.id, locationValue: loc.id === 'none' ? '' : prev.locationValue }))}
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 text-xs font-medium transition-all duration-200 cursor-pointer ${
+                        formData.locationType === loc.id
+                          ? 'border-[var(--primary)] bg-[var(--primary-light)]'
+                          : 'border-[var(--border)] hover:border-[var(--primary)] bg-white'
+                      }`}
+                      id={`loc-${loc.id}`}
+                    >
+                      <span>{loc.icon}</span>
+                      {loc.label}
+                    </button>
+                  ))}
+                </div>
+                {formData.locationType === 'google-meet' && (
+                  <input
+                    type="url"
+                    className="input"
+                    placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                    value={formData.locationValue}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, locationValue: e.target.value }))}
+                  />
+                )}
+                {formData.locationType === 'teams' && (
+                  <input
+                    type="url"
+                    className="input"
+                    placeholder="https://teams.microsoft.com/l/meetup-join/..."
+                    value={formData.locationValue}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, locationValue: e.target.value }))}
+                  />
+                )}
+                {formData.locationType === 'zoom' && (
+                  <input
+                    type="url"
+                    className="input"
+                    placeholder="https://zoom.us/j/1234567890"
+                    value={formData.locationValue}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, locationValue: e.target.value }))}
+                  />
+                )}
+                {formData.locationType === 'custom' && (
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="e.g. Office Room 301, 123 Main Street"
+                    value={formData.locationValue}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, locationValue: e.target.value }))}
+                  />
+                )}
+              </div>
 
               {/* Slug */}
               <div>

@@ -223,6 +223,28 @@ export default function PublicBookingPage() {
                 {eventType.duration} min
               </div>
 
+              {/* Location */}
+              {eventType.locationType && eventType.locationType !== 'none' && (
+                <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <span>
+                    {eventType.locationType === 'google-meet' ? '🎥 Google Meet' :
+                     eventType.locationType === 'teams' ? '💬 Microsoft Teams' :
+                     eventType.locationType === 'zoom' ? '📹 Zoom' :
+                     '📍 In-Person'}
+                    {eventType.locationValue && eventType.locationType !== 'custom' && (
+                      <> — <a href={eventType.locationValue} target="_blank" rel="noopener noreferrer" className="text-[var(--primary)] hover:underline" style={{ wordBreak: 'break-all' }}>Join</a></>
+                    )}
+                    {eventType.locationValue && eventType.locationType === 'custom' && (
+                      <> — {eventType.locationValue}</>
+                    )}
+                  </span>
+                </div>
+              )}
+
               {/* Group: max invitees */}
               {eventType.kind === 'group' && (
                 <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">

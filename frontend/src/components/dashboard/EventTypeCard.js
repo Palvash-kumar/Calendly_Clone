@@ -92,6 +92,16 @@ export default function EventTypeCard({ eventType, onEdit, onDelete }) {
             </span>
           )}
 
+          {/* Location badge */}
+          {eventType.locationType && eventType.locationType !== 'none' && (
+            <span className="badge" style={{ background: '#F0F9FF', color: '#0369A1' }}>
+              {eventType.locationType === 'google-meet' ? '🎥 Meet' :
+               eventType.locationType === 'teams' ? '💬 Teams' :
+               eventType.locationType === 'zoom' ? '📹 Zoom' :
+               '📍 In-Person'}
+            </span>
+          )}
+
           {/* Booking count */}
           {eventType._count?.bookings > 0 && (
             <span className="badge badge-gray">

@@ -279,7 +279,7 @@ const bookingService = {
       },
       include: {
         eventType: {
-          select: { name: true, duration: true, color: true, slug: true, userId: true, kind: true },
+          select: { name: true, duration: true, color: true, slug: true, userId: true, kind: true, locationType: true, locationValue: true },
         },
         invitee: {
           select: { name: true, email: true, avatar: true },

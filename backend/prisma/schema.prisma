@@ -42,6 +42,10 @@ model EventType {
   // Max invitees per slot (only used for group events)
   maxInvitees Int    @default(1) @map("max_invitees")
 
+  // Location: google-meet | teams | zoom | custom | none
+  locationType  String @default("none") @map("location_type")
+  locationValue String @default("") @map("location_value")
+
   userId Int  @map("user_id")
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
