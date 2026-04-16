@@ -50,7 +50,7 @@ function MeetingsPageContent() {
       />
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[var(--bg-tertiary)] rounded-xl p-1 mb-6 max-w-xs">
+      <div className="flex gap-1 rounded-xl p-1 mb-6 max-w-xs glass">
         {['upcoming', 'past'].map((tab) => (
           <button
             key={tab}
@@ -88,7 +88,7 @@ function MeetingsPageContent() {
 
       {/* Empty State */}
       {!loading && bookings.length === 0 && (
-        <div className="card text-center py-12 sm:py-16">
+        <div className="card glass text-center py-12 sm:py-16">
           <div className="w-16 h-16 rounded-2xl bg-[var(--bg-tertiary)] flex items-center justify-center mx-auto mb-4">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -114,7 +114,7 @@ function MeetingsPageContent() {
           {bookings.map((booking, i) => (
             <div
               key={booking.id}
-              className="card animate-fade-in hover:shadow-md"
+              className="card glass animate-fade-in hover:-translate-y-0.5 transition-all duration-300"
               style={{ animationDelay: `${i * 50}ms` }}
             >
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -288,7 +288,14 @@ function CalendarDropdown({ booking }) {
 
       {open && (
         <div
-          className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-[var(--border)] py-1 z-50 min-w-[180px] animate-fade-in"
+          className="absolute right-0 top-full mt-1 rounded-lg py-1 z-50 min-w-[180px] animate-fade-in"
+          style={{
+            background: 'rgba(255, 255, 255, 0.23)',
+            boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.55)',
+          }}
         >
           <a
             href={getGoogleCalendarUrl(calendarData)}

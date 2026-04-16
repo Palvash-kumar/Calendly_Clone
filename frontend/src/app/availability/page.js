@@ -142,7 +142,7 @@ function AvailabilityPageContent() {
         }
       />
 
-      <div className="card">
+      <div className="card glass">
         {/* Timezone info */}
         <div className="flex items-center gap-2 mb-6 pb-5 border-b border-[var(--border)]">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

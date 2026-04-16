@@ -30,7 +30,7 @@ export default function EventTypeCard({ eventType, onEdit, onDelete }) {
   };
 
   return (
-    <div className="card animate-fade-in group relative">
+    <div className="card glass animate-fade-in group relative">
       {/* Color accent bar */}
       <div
         className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"

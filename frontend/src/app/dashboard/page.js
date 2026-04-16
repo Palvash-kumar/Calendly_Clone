@@ -27,7 +27,13 @@ function DashboardContent() {
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto">
       {/* Welcome Header */}
-      <div className="card mb-8 animate-fade-in" style={{ background: 'linear-gradient(135deg, var(--primary) 0%, #0052CC 100%)' }}>
+      <div className="card mb-8 animate-fade-in" style={{
+        background: 'linear-gradient(135deg, rgba(0, 107, 255, 0.85) 0%, rgba(0, 82, 204, 0.85) 100%)',
+        backdropFilter: 'blur(2.9px)',
+        WebkitBackdropFilter: 'blur(2.9px)',
+        border: '1px solid rgba(255, 255, 255, 0.55)',
+        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+      }}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-2">
           <div className="flex items-center gap-4">
             {/* Avatar */}
@@ -115,7 +121,7 @@ function DashboardContent() {
           <Link
             key={item.href}
             href={item.href}
-            className={`card flex flex-col gap-3 no-underline hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 animate-fade-in stagger-${i + 1}`}
+            className={`card glass flex flex-col gap-3 no-underline hover:-translate-y-1 transition-all duration-300 animate-fade-in stagger-${i + 1}`}
             style={{ animationFillMode: 'backwards' }}
           >
             <div
@@ -137,10 +143,13 @@ function DashboardContent() {
         <div className="mt-6">
           <Link
             href="/admin"
-            className="card flex items-center gap-4 no-underline hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 animate-fade-in"
+            className="card flex items-center gap-4 no-underline hover:-translate-y-1 transition-all duration-300 animate-fade-in"
             style={{
-              background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #334155 100%)',
-              border: 'none',
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.85) 60%, rgba(51, 65, 85, 0.85) 100%)',
+              backdropFilter: 'blur(2.9px)',
+              WebkitBackdropFilter: 'blur(2.9px)',
+              border: '1px solid rgba(255, 255, 255, 0.55)',
+              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
               animationFillMode: 'backwards',
             }}
           >

@@ -236,7 +236,15 @@ export default function Sidebar() {
   return (
     <>
       {/* ── Mobile: Hamburger Button (top bar) ── */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-[var(--border)] flex items-center px-4 py-3">
+      <div
+        className="md:hidden fixed top-0 left-0 right-0 z-40 flex items-center px-4 py-3"
+        style={{
+          background: 'rgba(255, 255, 255, 0.23)',
+          backdropFilter: 'blur(2.9px)',
+          WebkitBackdropFilter: 'blur(2.9px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.55)',
+        }}
+      >
         <button
           onClick={() => setMobileOpen(true)}
           className="btn btn-ghost p-2 rounded-lg"
@@ -272,8 +280,14 @@ export default function Sidebar() {
           />
           {/* Drawer */}
           <aside
-            className="absolute top-0 left-0 bottom-0 w-[280px] bg-white flex flex-col shadow-lg"
-            style={{ animation: 'slideInLeft 0.25s ease-out forwards' }}
+            className="absolute top-0 left-0 bottom-0 w-[280px] flex flex-col shadow-lg"
+            style={{
+              animation: 'slideInLeft 0.25s ease-out forwards',
+              background: 'rgba(255, 255, 255, 0.23)',
+              backdropFilter: 'blur(2.9px)',
+              WebkitBackdropFilter: 'blur(2.9px)',
+              borderRight: '1px solid rgba(255, 255, 255, 0.55)',
+            }}
           >
             {/* Close button */}
             <div className="absolute top-4 right-4">
@@ -295,7 +309,15 @@ export default function Sidebar() {
       )}
 
       {/* ── Desktop: Fixed Sidebar ── */}
-      <aside className="hidden md:flex w-[260px] bg-white border-r border-[var(--border)] flex-col min-h-screen shrink-0">
+      <aside
+        className="hidden md:flex w-[260px] border-r flex-col min-h-screen shrink-0"
+        style={{
+          background: 'rgba(255, 255, 255, 0.23)',
+          backdropFilter: 'blur(2.9px)',
+          WebkitBackdropFilter: 'blur(2.9px)',
+          borderColor: 'rgba(255, 255, 255, 0.55)',
+        }}
+      >
         {sidebarContent}
       </aside>
     </>

@@ -210,7 +210,7 @@ function ProfileContent() {
       </div>
 
       {/* ── Avatar Section ── */}
-      <div className="card mb-6 animate-fade-in stagger-1" style={{ animationFillMode: 'backwards' }}>
+      <div className="card glass mb-6 animate-fade-in stagger-1" style={{ animationFillMode: 'backwards' }}>
         <h2 className="text-base font-semibold text-[var(--text-primary)] m-0 mb-5">
           Profile Picture
         </h2>
@@ -333,7 +333,7 @@ function ProfileContent() {
       </div>
 
       {/* ── Personal Info Section ── */}
-      <div className="card mb-6 animate-fade-in stagger-2" style={{ animationFillMode: 'backwards' }}>
+      <div className="card glass mb-6 animate-fade-in stagger-2" style={{ animationFillMode: 'backwards' }}>
         <h2 className="text-base font-semibold text-[var(--text-primary)] m-0 mb-5">
           Personal Information
         </h2>
@@ -418,7 +418,7 @@ function ProfileContent() {
       </div>
 
       {/* ── Account Info Card ── */}
-      <div className="card animate-fade-in stagger-3" style={{ animationFillMode: 'backwards' }}>
+      <div className="card glass animate-fade-in stagger-3" style={{ animationFillMode: 'backwards' }}>
         <h2 className="text-base font-semibold text-[var(--text-primary)] m-0 mb-4">
           Account Details
         </h2>

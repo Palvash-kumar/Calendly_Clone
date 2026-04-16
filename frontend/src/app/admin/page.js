@@ -154,8 +154,11 @@ function AdminDashboardContent() {
       <div
         className="card mb-8 animate-fade-in"
         style={{
-          background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #334155 100%)',
-          border: 'none',
+          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.85) 60%, rgba(51, 65, 85, 0.85) 100%)',
+          backdropFilter: 'blur(2.9px)',
+          WebkitBackdropFilter: 'blur(2.9px)',
+          border: '1px solid rgba(255, 255, 255, 0.55)',
+          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
         }}
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-2">
@@ -193,7 +196,7 @@ function AdminDashboardContent() {
       </div>
 
       {/* ─── Tabs ─── */}
-      <div className="flex gap-1 bg-[var(--bg-tertiary)] rounded-xl p-1 mb-6 overflow-x-auto">
+      <div className="flex gap-1 rounded-xl p-1 mb-6 overflow-x-auto glass">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -276,10 +279,8 @@ function AdminDashboardContent() {
                 ].map((card, i) => (
                   <div
                     key={card.label}
-                    className="rounded-2xl p-5 animate-fade-in border"
+                    className="rounded-2xl p-5 animate-fade-in glass"
                     style={{
-                      background: card.bg,
-                      borderColor: `${card.accent}18`,
                       animationDelay: `${i * 80}ms`,
                       animationFillMode: 'backwards',
                     }}
@@ -302,7 +303,7 @@ function AdminDashboardContent() {
               {/* Bottom row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Booking Breakdown */}
-                <div className="card">
+                <div className="card glass">
                   <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                     <span style={{
                       width: 28, height: 28, borderRadius: 8,
@@ -344,7 +345,7 @@ function AdminDashboardContent() {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="card">
+                <div className="card glass">
                   <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                     <span style={{
                       width: 28, height: 28, borderRadius: 8,
@@ -410,7 +411,7 @@ function AdminDashboardContent() {
               <p className="text-[var(--text-secondary)]">No users found.</p>
             </div>
           ) : (
-            <div className="card overflow-x-auto" style={{ padding: 0 }}>
+            <div className="card glass overflow-x-auto" style={{ padding: 0 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid var(--border)', background: 'var(--bg-secondary)' }}>
@@ -496,7 +497,7 @@ function AdminDashboardContent() {
       {activeTab === 'meetings' && (
         <div className="animate-fade-in">
           <div className="flex flex-col sm:flex-row gap-3 mb-4">
-            <div className="flex gap-1 bg-[var(--bg-tertiary)] rounded-xl p-1">
+            <div className="flex gap-1 rounded-xl p-1 glass">
               {['upcoming', 'past', 'cancelled'].map(f => (
                 <button
                   key={f}
@@ -543,7 +544,7 @@ function AdminDashboardContent() {
               {filteredBookings.map((booking, i) => (
                 <div
                   key={booking.id}
-                  className="card animate-fade-in hover:shadow-md"
+                  className="card glass animate-fade-in hover:-translate-y-0.5 transition-all duration-300"
                   style={{ animationDelay: `${i * 40}ms`, animationFillMode: 'backwards' }}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -629,7 +630,7 @@ function AdminDashboardContent() {
               {filteredEventTypes.map((et, i) => (
                 <div
                   key={et.id}
-                  className="card animate-fade-in hover:shadow-md"
+                  className="card glass animate-fade-in hover:-translate-y-0.5 transition-all duration-300"
                   style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'backwards' }}
                 >
                   {/* Color top bar */}
