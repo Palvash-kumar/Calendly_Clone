@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Toast from '@/components/layout/Toast';
 import { adminAPI } from '@/services/api';
@@ -27,6 +27,12 @@ function AdminDashboardContent() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [toast, setToast] = useState(null);
+  const [tabTransitionKey, setTabTransitionKey] = useState(0);
+
+  // Sliding glass indicator
+  const tabContainerRef = useRef(null);
+  const tabRefs = useRef({});
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
 
   // data
   const [stats, setStats] = useState(null);
@@ -40,6 +46,26 @@ function AdminDashboardContent() {
   const [userSearch, setUserSearch] = useState('');
   const [bookingSearch, setBookingSearch] = useState('');
   const [eventSearch, setEventSearch] = useState('');
+
+  // Measure active tab position for sliding indicator
+  useEffect(() => {
+    const activeEl = tabRefs.current[activeTab];
+    const container = tabContainerRef.current;
+    if (activeEl && container) {
+      const containerRect = container.getBoundingClientRect();
+      const tabRect = activeEl.getBoundingClientRect();
+      setIndicator({
+        left: tabRect.left - containerRect.left,
+        width: tabRect.width,
+      });
+    }
+  }, [activeTab]);
+
+  const handleTabChange = (key) => {
+    if (key === activeTab) return;
+    setTabTransitionKey((k) => k + 1);
+    setActiveTab(key);
+  };
 
   useEffect(() => {
     const u = getUser();
@@ -195,19 +221,37 @@ function AdminDashboardContent() {
         </div>
       </div>
 
-      {/* ─── Tabs ─── */}
-      <div className="flex gap-1 rounded-xl p-1 mb-6 overflow-x-auto glass">
+      {/* ─── Tabs with sliding glass indicator ─── */}
+      <div
+        ref={tabContainerRef}
+        className="relative flex gap-1 rounded-xl p-1 mb-6 overflow-x-auto glass"
+      >
+        {/* Sliding glass pill */}
+        <div
+          className="absolute top-1 bottom-1 rounded-lg transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] z-0"
+          style={{
+            left: indicator.left,
+            width: indicator.width,
+            background: 'rgba(255, 255, 255, 0.75)',
+            boxShadow: '0 2px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+          }}
+        />
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            ref={(el) => (tabRefs.current[tab.key] = el)}
+            onClick={() => handleTabChange(tab.key)}
             className={`
-              flex items-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap
+              flex items-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-300 whitespace-nowrap relative z-10 cursor-pointer
               ${activeTab === tab.key
-                ? 'bg-white text-[var(--text-primary)] shadow-sm'
+                ? 'text-[var(--text-primary)]'
                 : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }
             `}
+            style={{ background: 'transparent', border: 'none' }}
             id={`admin-tab-${tab.key}`}
           >
             <span>{tab.icon}</span>
@@ -216,9 +260,16 @@ function AdminDashboardContent() {
         ))}
       </div>
 
+      {/* Content area with smooth glass transition */}
+      <div
+        key={tabTransitionKey}
+        style={{
+          animation: 'glassTabFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+        }}
+      >
       {/* ════════════════════ OVERVIEW TAB ════════════════════ */}
       {activeTab === 'overview' && (
-        <div className="animate-fade-in">
+        <div>
           {loading || !stats ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map(i => (
@@ -362,7 +413,7 @@ function AdminDashboardContent() {
                     ].map(action => (
                       <button
                         key={action.tab}
-                        onClick={() => setActiveTab(action.tab)}
+                        onClick={() => handleTabChange(action.tab)}
                         className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[var(--text-primary)] hover:shadow-sm transition-all duration-200 w-full text-left border cursor-pointer"
                         style={{ background: action.bg, borderColor: 'transparent' }}
                         onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
@@ -681,6 +732,7 @@ function AdminDashboardContent() {
           )}
         </div>
       )}
+      </div>
 
       <Toast
         message={toast?.message}
