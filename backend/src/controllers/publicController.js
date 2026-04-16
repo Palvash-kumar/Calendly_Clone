@@ -41,11 +41,12 @@ const publicController = {
   },
 
   /**
-   * POST /api/book — Create a booking.
+   * POST /api/book — Create a booking (requires authentication).
+   * The logged-in user is the invitee.
    */
   async book(req, res, next) {
     try {
-      const booking = await bookingService.create(req.body);
+      const booking = await bookingService.create(req.body, req.user);
       res.status(201).json({ success: true, data: booking });
     } catch (error) {
       next(error);

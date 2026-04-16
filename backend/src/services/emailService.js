@@ -284,6 +284,69 @@ const emailService = {
       console.error(`❌ Failed to send host reminder for booking #${booking.id}:`, err.message);
     }
   },
+  /**
+   * Send an invitation email to a co-host when they're added to an event.
+   *
+   * @param {object} params
+   * @param {string} params.coHostEmail - Co-host email
+   * @param {string} params.coHostName - Co-host name
+   * @param {string} params.eventName - Event type name
+   * @param {string} params.eventKind - 'round-robin' or 'collective'
+   * @param {number} params.duration - Event duration in minutes
+   * @param {string} params.hostName - Creator/host name
+   * @param {string} params.slug - Event slug for linking
+   */
+  async sendCoHostInvitation({ coHostEmail, coHostName, eventName, eventKind, duration, hostName, slug }) {
+    const transport = getTransporter();
+    if (!transport) return;
+
+    const kindLabel = eventKind === 'round-robin' ? 'Round Robin' : 'Collective';
+    const kindDesc = eventKind === 'round-robin'
+      ? 'Meetings will be distributed between you and other hosts in rotation.'
+      : 'You will join all meetings together with the other hosts.';
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+    const bodyHTML = `
+      <p style="font-size:15px;color:#374151;margin:0 0 20px;line-height:1.6;">
+        Hi <strong>${coHostName || 'there'}</strong>, you've been added as a co-host!
+      </p>
+      ${detailRow(icons.event, 'Event', eventName)}
+      ${detailRow(icons.clock, 'Duration', `${duration} minutes`)}
+      ${detailRow(icons.user, 'Added by', hostName)}
+      <div style="margin-top:20px;padding:16px;background:#f5f3ff;border-radius:12px;border:1px solid #ddd6fe;">
+        <p style="margin:0 0 4px;font-size:13px;color:#5b21b6;font-weight:600;">
+          ${kindLabel} Event
+        </p>
+        <p style="margin:0;font-size:13px;color:#6d28d9;">
+          ${kindDesc}
+        </p>
+      </div>
+      <div style="margin-top:24px;text-align:center;">
+        <a href="${frontendUrl}/meetings" style="display:inline-block;padding:12px 28px;background:#006BFF;color:#ffffff;text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;">
+          View Your Meetings
+        </a>
+      </div>`;
+
+    const html = buildEmailHTML({
+      heading: '🤝 You\'ve been added as a Co-Host!',
+      preheader: `${hostName} added you as a co-host for "${eventName}".`,
+      bodyHTML: bodyHTML,
+      accentColor: '#7C3AED',
+    });
+
+    try {
+      await transport.sendMail({
+        from: `"Calendly Clone" <${process.env.SMTP_USER}>`,
+        to: coHostEmail,
+        subject: `🤝 Co-Host Invitation: ${eventName}`,
+        html,
+      });
+      console.log(`📧 Co-host invitation sent to ${coHostEmail} for "${eventName}"`);
+    } catch (err) {
+      console.error(`❌ Failed to send co-host invitation to ${coHostEmail}:`, err.message);
+    }
+  },
 };
 
 module.exports = emailService;

@@ -1,25 +1,33 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { isAuthenticated } from '@/utils/auth';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-export default function LoginPage() {
+function LoginPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
+
+  // Get returnTo URL from query params (e.g., /login?returnTo=/event/some-slug)
+  const returnTo = searchParams.get('returnTo');
 
   useEffect(() => {
     setMounted(true);
-    // If already logged in, redirect to dashboard
+    // If already logged in, redirect to returnTo or dashboard
     if (isAuthenticated()) {
-      router.replace('/');
+      router.replace(returnTo || '/');
     }
-  }, [router]);
+  }, [router, returnTo]);
 
   const handleGoogleLogin = () => {
+    // Save returnTo so we can redirect after OAuth callback
+    if (returnTo) {
+      sessionStorage.setItem('returnTo', returnTo);
+    }
     window.location.href = `${API_BASE}/auth/google`;
   };
 
@@ -113,5 +121,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageInner />
+    </Suspense>
   );
 }

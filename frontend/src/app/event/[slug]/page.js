@@ -8,10 +8,12 @@ import TimeSlots from '@/components/booking/TimeSlots';
 import BookingForm from '@/components/booking/BookingForm';
 import Toast from '@/components/layout/Toast';
 import { publicAPI } from '@/services/api';
+import { isAuthenticated, getUser } from '@/utils/auth';
 
 /**
  * Public booking page — Calendly-style two-column layout.
- * Flow: Select Date → Select Time → Enter Details → Redirect to Confirmation
+ * Flow: Login Check → Select Date → Select Time → Confirm → Redirect
+ * Invitee must be logged in to book.
  */
 export default function PublicBookingPage() {
   const params = useParams();
@@ -21,6 +23,8 @@ export default function PublicBookingPage() {
   const [eventType, setEventType] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
   // Booking flow state
   const [selectedDate, setSelectedDate] = useState(null);
@@ -30,8 +34,21 @@ export default function PublicBookingPage() {
   const [showForm, setShowForm] = useState(false);
   const [toast, setToast] = useState(null);
 
+  // Check if invitee is logged in
+  useEffect(() => {
+    if (isAuthenticated()) {
+      setUser(getUser());
+      setAuthChecked(true);
+    } else {
+      // Redirect to login, with a return URL so they come back after login
+      const returnUrl = encodeURIComponent(`/event/${slug}`);
+      router.replace(`/login?returnTo=${returnUrl}`);
+    }
+  }, [router, slug]);
+
   // Fetch event type details
   useEffect(() => {
+    if (!authChecked) return;
     const fetchEvent = async () => {
       try {
         const res = await publicAPI.getEvent(slug);
@@ -43,7 +60,7 @@ export default function PublicBookingPage() {
       }
     };
     fetchEvent();
-  }, [slug]);
+  }, [slug, authChecked]);
 
   // Fetch slots when date is selected
   useEffect(() => {
@@ -72,12 +89,10 @@ export default function PublicBookingPage() {
     setShowForm(true);
   };
 
-  const handleBookingSubmit = async (formData) => {
+  const handleBookingSubmit = async () => {
     try {
       const res = await publicAPI.book({
         eventTypeId: eventType.id,
-        name: formData.name,
-        email: formData.email,
         startTime: selectedSlot.start,
         endTime: selectedSlot.end,
       });
@@ -100,6 +115,24 @@ export default function PublicBookingPage() {
       throw err;
     }
   };
+
+  // Auth check in progress
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)] p-4">
+        <div className="flex flex-col items-center gap-3">
+          <div
+            className="w-8 h-8 border-3 border-[var(--border)] rounded-full"
+            style={{
+              borderTopColor: 'var(--primary)',
+              animation: 'spin 0.8s linear infinite',
+            }}
+          />
+          <p className="text-sm text-[var(--text-muted)]">Checking login...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Error state
   if (error) {
@@ -168,6 +201,19 @@ export default function PublicBookingPage() {
             </h1>
 
             <div className="flex flex-col gap-3">
+              {/* Event Kind Badge */}
+              <div className="flex items-center gap-2 text-sm">
+                <span
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium"
+                  style={{
+                    backgroundColor: eventType.kind === 'group' ? '#ECFDF5' : eventType.kind === 'round-robin' ? '#FFFBEB' : eventType.kind === 'collective' ? '#F5F3FF' : '#EFF6FF',
+                    color: eventType.kind === 'group' ? '#059669' : eventType.kind === 'round-robin' ? '#D97706' : eventType.kind === 'collective' ? '#7C3AED' : '#006BFF',
+                  }}
+                >
+                  {eventType.kind === 'one-on-one' ? 'One-on-one' : eventType.kind === 'group' ? 'Group' : eventType.kind === 'round-robin' ? 'Round Robin' : 'Collective'}
+                </span>
+              </div>
+
               {/* Duration */}
               <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -176,6 +222,51 @@ export default function PublicBookingPage() {
                 </svg>
                 {eventType.duration} min
               </div>
+
+              {/* Group: max invitees */}
+              {eventType.kind === 'group' && (
+                <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                  Up to {eventType.maxInvitees} invitees
+                </div>
+              )}
+
+              {/* Co-hosts for round-robin/collective */}
+              {(eventType.kind === 'round-robin' || eventType.kind === 'collective') && eventType.coHosts?.length > 0 && (
+                <div className="pt-2 border-t border-[var(--border)]">
+                  <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-2 m-0">
+                    {eventType.kind === 'round-robin' ? 'Available Hosts' : 'Meeting Hosts'}
+                  </p>
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
+                        style={{ backgroundColor: eventType.color || '#006BFF' }}
+                      >
+                        {eventType.user?.name?.charAt(0) || 'A'}
+                      </div>
+                      {eventType.user?.name || 'Host'}
+                    </div>
+                    {eventType.coHosts.map((ch) => (
+                      <div key={ch.user.id} className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
+                        {ch.user.avatar ? (
+                          <img src={ch.user.avatar} alt={ch.user.name} className="w-6 h-6 rounded-full object-cover shrink-0" referrerPolicy="no-referrer" />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-[var(--primary)] flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                            {ch.user.name?.charAt(0) || '?'}
+                          </div>
+                        )}
+                        {ch.user.name || ch.user.email}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Selected date/time */}
               {selectedSlot && (
@@ -201,16 +292,28 @@ export default function PublicBookingPage() {
                 </svg>
                 India Standard Time
               </div>
+
+              {/* Logged-in user info */}
+              {user && (
+                <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mt-2 pt-3 border-t border-[var(--border)]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>Booking as <strong>{user.name || user.email}</strong></span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Right Panel — Calendar / Slots / Form */}
           <div className="flex-1 p-5 sm:p-6">
             {showForm && selectedSlot ? (
-              // Step 3: Booking Form
+              // Step 3: Booking Confirmation (auto-filled from logged-in user)
               <BookingForm
                 selectedSlot={selectedSlot}
                 eventType={eventType}
+                user={user}
                 onSubmit={handleBookingSubmit}
                 onBack={() => setShowForm(false)}
               />
