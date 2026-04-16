@@ -131,6 +131,35 @@ function DashboardContent() {
           </Link>
         ))}
       </div>
+
+      {/* Admin Quick Access — only for admin */}
+      {user?.email === 'konda20006@gmail.com' && (
+        <div className="mt-6">
+          <Link
+            href="/admin"
+            className="card flex items-center gap-4 no-underline hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 animate-fade-in"
+            style={{
+              background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #334155 100%)',
+              border: 'none',
+              animationFillMode: 'backwards',
+            }}
+          >
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #38BDF8, #06B6D4)' }}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold m-0" style={{ color: 'whitesmoke' }}>Admin Console</h3>
+              <p className="text-xs text-slate-400 mt-1 m-0">Manage all users, meetings, and platform data</p>
+            </div>
+            <svg className="ml-auto" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><polyline points="9,18 15,12 9,6" /></svg>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getUser, logout } from '@/utils/auth';
 
+const ADMIN_EMAIL = 'konda20006@gmail.com';
+
 const navItems = [
   {
     label: 'Dashboard',
@@ -63,6 +65,16 @@ const navItems = [
     ),
   },
 ];
+
+const adminNavItem = {
+  label: 'Admin Panel',
+  href: '/admin',
+  icon: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  ),
+};
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -150,6 +162,34 @@ export default function Sidebar() {
               </li>
             );
           })}
+
+          {/* Admin Panel — only for admin user */}
+          {mounted && user?.email === ADMIN_EMAIL && (
+            <>
+              <li className="my-1 mx-4 border-t border-[var(--border)]" />
+              <li>
+                <Link
+                  href={adminNavItem.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`
+                    flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium no-underline transition-all duration-200
+                    ${pathname === '/admin'
+                      ? 'bg-[#F0FDFA] text-[#0F766E]'
+                      : 'text-[#0F766E] hover:bg-[#F0FDFA]'
+                    }
+                  `}
+                >
+                  <span className="text-[#0D9488]">
+                    {adminNavItem.icon}
+                  </span>
+                  {adminNavItem.label}
+                  <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-[#0F172A] text-white font-bold">
+                    ADM
+                  </span>
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
 

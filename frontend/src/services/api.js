@@ -81,4 +81,14 @@ export const profileAPI = {
   removeAvatar: () => api.delete('/profile/avatar'),
 };
 
+// ─── Admin ────────────────────────────────────────────────
+export const adminAPI = {
+  getStats: () => api.get('/admin/stats'),
+  getUsers: () => api.get('/admin/users'),
+  getBookings: (type = 'upcoming') => api.get('/admin/bookings', { params: { type } }),
+  getEventTypes: () => api.get('/admin/event-types'),
+  cancelBooking: (id) => api.patch(`/admin/bookings/${id}/cancel`),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+};
+
 export default api;

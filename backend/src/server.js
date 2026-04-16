@@ -13,6 +13,7 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const publicRoutes = require('./routes/publicRoutes');
 const publicController = require('./controllers/publicController');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -48,6 +49,9 @@ app.use('/api/event-types', eventTypeRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/profile', profileRoutes);
+
+// Admin routes (require auth + admin check)
+app.use('/api/admin', adminRoutes);
 
 // Public routes (event details and slots — no auth required)
 app.use('/api/event', publicRoutes);
