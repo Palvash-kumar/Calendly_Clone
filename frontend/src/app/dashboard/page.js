@@ -80,7 +80,7 @@ function DashboardContent() {
           {
             title: 'Event Types',
             description: 'Create and manage your meeting types',
-            href: '/',
+            href: '/event-types',
             icon: (
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />

@@ -144,8 +144,8 @@ function ConfirmationContent() {
         )}
 
         {/* Action */}
-        <Link href="/" className="btn btn-secondary">
-          Back to Home
+        <Link href="/dashboard" className="btn btn-secondary">
+          Back to Dashboard
         </Link>
       </div>
     </div>

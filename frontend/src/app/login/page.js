@@ -19,7 +19,7 @@ function LoginPageInner() {
     setMounted(true);
     // If already logged in, redirect to returnTo or dashboard
     if (isAuthenticated()) {
-      router.replace(returnTo || '/');
+      router.replace(returnTo || '/dashboard');
     }
   }, [router, returnTo]);
 

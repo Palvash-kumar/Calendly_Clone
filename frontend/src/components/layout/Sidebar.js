@@ -22,7 +22,7 @@ const navItems = [
   },
   {
     label: 'Event Types',
-    href: '/',
+    href: '/event-types',
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -85,6 +85,7 @@ export default function Sidebar() {
   // Hide sidebar on public booking pages and login page
   const isPublicPage = pathname.startsWith('/event/');
   const isLoginPage = pathname === '/login';
+  const isLandingPage = pathname === '/';
 
   useEffect(() => {
     setMounted(true);
@@ -107,7 +108,7 @@ export default function Sidebar() {
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen]);
 
-  if (isPublicPage || isLoginPage) return null;
+  if (isPublicPage || isLoginPage || isLandingPage) return null;
 
   const handleLogout = () => {
     logout();
