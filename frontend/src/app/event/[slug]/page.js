@@ -206,8 +206,8 @@ export default function PublicBookingPage() {
                 <span
                   className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium"
                   style={{
-                    backgroundColor: eventType.kind === 'group' ? '#ECFDF5' : eventType.kind === 'round-robin' ? '#FFFBEB' : eventType.kind === 'collective' ? '#F5F3FF' : '#EFF6FF',
-                    color: eventType.kind === 'group' ? '#059669' : eventType.kind === 'round-robin' ? '#D97706' : eventType.kind === 'collective' ? '#7C3AED' : '#006BFF',
+                    backgroundColor: eventType.kind === 'group' ? '#ECFDF5' : eventType.kind === 'round-robin' ? '#FFFBEB' : eventType.kind === 'collective' ? '#F0FDFA' : '#EFF6FF',
+                    color: eventType.kind === 'group' ? '#059669' : eventType.kind === 'round-robin' ? '#D97706' : eventType.kind === 'collective' ? '#0D9488' : '#006BFF',
                   }}
                 >
                   {eventType.kind === 'one-on-one' ? 'One-on-one' : eventType.kind === 'group' ? 'Group' : eventType.kind === 'round-robin' ? 'Round Robin' : 'Collective'}

@@ -204,8 +204,8 @@ function MeetingsPageContent() {
                           <span className="badge" style={{
                             fontSize: '0.65rem',
                             padding: '2px 6px',
-                            background: '#F3E8FF',
-                            color: '#7C3AED',
+                            background: '#F0FDFA',
+                            color: '#0D9488',
                           }}>
                             Invitee
                           </span>

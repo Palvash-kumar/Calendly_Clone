@@ -57,7 +57,7 @@ const EVENT_KINDS = [
   },
 ];
 
-const COLORS = ['#006BFF', '#FF6B00', '#00C853', '#7C3AED', '#E91E63', '#00BCD4', '#FF5722', '#607D8B'];
+const COLORS = ['#006BFF', '#FF6B00', '#00C853', '#0D9488', '#E91E63', '#00BCD4', '#FF5722', '#607D8B'];
 
 /**
  * Modal dialog for creating or editing an event type.

@@ -102,11 +102,28 @@ export function getUser() {
 }
 
 /**
- * Logout: remove token and redirect to login page.
+ * Check if the token is expiring within the next 5 minutes.
+ * @returns {boolean}
+ */
+export function isTokenExpiringSoon() {
+  const token = getToken();
+  if (!token) return true;
+  try {
+    const payload = decodeToken(token);
+    if (!payload.exp) return false;
+    const fiveMinutes = 5 * 60 * 1000;
+    return payload.exp * 1000 - Date.now() < fiveMinutes;
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Logout: remove token and redirect to homepage.
  */
 export function logout() {
   removeToken();
   if (typeof window !== 'undefined') {
-    window.location.href = '/login';
+    window.location.href = '/';
   }
 }

@@ -6,7 +6,7 @@ const KIND_LABELS = {
   'one-on-one': { label: 'One-on-one', color: '#006BFF', bg: '#EFF6FF' },
   'group': { label: 'Group', color: '#059669', bg: '#ECFDF5' },
   'round-robin': { label: 'Round Robin', color: '#D97706', bg: '#FFFBEB' },
-  'collective': { label: 'Collective', color: '#7C3AED', bg: '#F5F3FF' },
+  'collective': { label: 'Collective', color: '#0D9488', bg: '#F0FDFA' },
 };
 
 /**
@@ -87,7 +87,7 @@ export default function EventTypeCard({ eventType, onEdit, onDelete }) {
 
           {/* Co-hosts count */}
           {(eventType.kind === 'round-robin' || eventType.kind === 'collective') && eventType.coHosts?.length > 0 && (
-            <span className="badge" style={{ background: '#F5F3FF', color: '#7C3AED' }}>
+            <span className="badge" style={{ background: '#F0FDFA', color: '#0D9488' }}>
               {eventType.coHosts.length + 1} hosts
             </span>
           )}
