@@ -2,8 +2,11 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const hpp = require('hpp');
 const passport = require('./config/passport');
 const errorHandler = require('./middleware/errorHandler');
+const { apiLimiter, authLimiter } = require('./middleware/rateLimiter');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -18,13 +21,34 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ─── Middleware ───────────────────────────────────────────
+// ─── Security Middleware ──────────────────────────────────
+// Helmet: sets various HTTP security headers (CSP, HSTS, X-Frame-Options, etc.)
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP for API-only backend
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false, // Required for OAuth redirects to Google
+}));
+
+// Prevent HTTP parameter pollution
+app.use(hpp());
+
+// CORS — hardened configuration
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400, // 24 hours preflight cache
 }));
-app.use(express.json());
+
+// Body parser with size limit to prevent large payload attacks
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: false, limit: '10kb' }));
+
 app.use(passport.initialize());
+
+// Global API rate limiter
+app.use('/api', apiLimiter);
 
 // Request logging in development
 if (process.env.NODE_ENV !== 'production') {
@@ -41,10 +65,10 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Calendly Clone API is running', timestamp: new Date().toISOString() });
 });
 
-// Auth routes
-app.use('/api/auth', authRoutes);
+// Auth routes (with stricter rate limiting)
+app.use('/api/auth', authLimiter, authRoutes);
 
-// Admin routes
+// Protected routes
 app.use('/api/event-types', eventTypeRoutes);
 app.use('/api/availability', availabilityRoutes);
 app.use('/api/bookings', bookingRoutes);
