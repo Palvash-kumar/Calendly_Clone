@@ -1752,3 +1752,240 @@ h1, h2, h3, h4, h5, h6 {
   text-align: center;
 }
 
+
+/* ═══════════════════════════════════════════════════════════
+   LIQUID GLASS EFFECT — macOS-Inspired Overrides
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── Base Button Glass ───────────────────────────────────── */
+.btn,
+.landing-btn {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    inset 4px 0 8px -4px rgba(0, 0, 0, 0.06),
+    inset -4px 0 8px -4px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn:hover:not(:disabled),
+.landing-btn:hover {
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.1),
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+    inset 4px 0 8px -4px rgba(0, 0, 0, 0.08),
+    inset -4px 0 8px -4px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled),
+.landing-btn:active {
+  transform: translateY(0.5px) scale(0.98);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    inset 0 2px 4px rgba(0, 0, 0, 0.08),
+    inset 4px 0 8px -4px rgba(0, 0, 0, 0.08),
+    inset -4px 0 8px -4px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Primary — tinted glass ──────────────────────────────── */
+.btn-primary,
+.landing-btn--primary {
+  background: linear-gradient(180deg, rgba(0, 107, 255, 0.6) 0%, rgba(0, 82, 204, 0.78) 100%);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 8px 32px rgba(0, 107, 255, 0.2),
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+    inset 4px 0 8px -4px rgba(0, 0, 0, 0.1),
+    inset -4px 0 8px -4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover:not(:disabled),
+.landing-btn--primary:hover {
+  background: linear-gradient(180deg, rgba(0, 107, 255, 0.75) 0%, rgba(0, 82, 204, 0.9) 100%);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 12px 40px rgba(0, 107, 255, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12),
+    inset 4px 0 8px -4px rgba(0, 0, 0, 0.12),
+    inset -4px 0 8px -4px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* ─── Secondary — frosted neutral ─────────────────────────── */
+.btn-secondary {
+  background: rgba(248, 250, 252, 0.6);
+  border-color: rgba(226, 232, 240, 0.7);
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(248, 250, 252, 0.85);
+  border-color: rgba(203, 213, 225, 0.8);
+}
+
+/* ─── Ghost — near-invisible glass ────────────────────────── */
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ─── Danger — red-tinted glass ───────────────────────────── */
+.btn-danger {
+  background: rgba(254, 226, 226, 0.5);
+  border-color: rgba(252, 165, 165, 0.5);
+  color: #DC2626;
+  box-shadow:
+    0 4px 16px rgba(220, 38, 38, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 4px 0 8px -4px rgba(220, 38, 38, 0.05),
+    inset -4px 0 8px -4px rgba(220, 38, 38, 0.05);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(254, 226, 226, 0.75);
+  border-color: rgba(220, 38, 38, 0.3);
+  box-shadow:
+    0 8px 24px rgba(220, 38, 38, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 4px 0 8px -4px rgba(220, 38, 38, 0.08),
+    inset -4px 0 8px -4px rgba(220, 38, 38, 0.08);
+}
+
+/* ─── Landing glass — enhanced ────────────────────────────── */
+.landing-btn--glass {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.landing-btn--glass:hover {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+/* ─── Enhanced .glass utility ─────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* ─── Enhanced card glass ─────────────────────────────────── */
+.card {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.card:hover {
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* ─── Enhanced modal glass ────────────────────────────────── */
+.modal-content {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* ─── Input glass effect ──────────────────────────────────── */
+.input {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.input:focus {
+  border-color: rgba(0, 107, 255, 0.5);
+  box-shadow:
+    0 0 0 3px rgba(0, 107, 255, 0.1),
+    inset 0 1px 3px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* ─── Toggle glass ────────────────────────────────────────── */
+.toggle {
+  background: rgba(226, 232, 240, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.toggle.active {
+  background: rgba(0, 107, 255, 0.65);
+  box-shadow:
+    0 2px 8px rgba(0, 107, 255, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* ─── Badge glass ─────────────────────────────────────────── */
+.badge {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* ─── Navbar scrolled glass ───────────────────────────────── */
+.landing-nav--scrolled {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.04),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+}
+
